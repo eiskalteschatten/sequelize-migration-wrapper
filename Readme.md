@@ -26,9 +26,7 @@ npm install --save sequelize-migration-wrapper
 
 ## Usage
 
-### To run through all migration scripts
-
-Umzug automatically saves which migration scripts have already been run, so it will not re-run those.
+### Initialization
 
 ```js
 const sequelize = new Sequelize({...});
@@ -40,8 +38,6 @@ const migrateDb = migration({
   path: 'path/to/migration/scripts',
   filePattern: /\.js$/
 });
-
-await migrateDb.migrate();
 ```
 
 #### Options
@@ -49,6 +45,7 @@ await migrateDb.migrate();
 - sequelize (no default, must be a Sequelize instance),
 - path (default: `path.join(__dirname, 'migrations')`),
 - filePattern (default: `/\.js$/`)
+
 
 
 ## API
