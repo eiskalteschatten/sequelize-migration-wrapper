@@ -13,7 +13,7 @@ function logUmzugEvent(eventName) {
 
 /*
   OPTIONS: {
-    sequelize (no default, must be a Sequelize instance),
+    sequelize (no default, must be a Sequelize instance; required),
     path (default: path.join(__dirname, 'migrations')),
     filePattern (default: /\.js$/)
   }
@@ -24,7 +24,7 @@ function setup(options) {
     const filePattern = options.filePattern || /\.js$/;
 
     if (!options.sequelize) {
-        console.error('');
+        console.error('sequelize-migration-wrapper requires an instance of Sequelize.');
         return;
     }
 
