@@ -55,7 +55,7 @@ function setup(options) {
     umzug.on('reverted',  logUmzugEvent('reverted'));
 }
 
-function cmdStatus() {
+function getStatus() {
     const result = {};
 
     return umzug.executed()
@@ -89,12 +89,12 @@ function cmdStatus() {
         });
 }
 
-function cmdMigrate() {
+function migrate() {
     return umzug.up();
 }
 
-function cmdMigrateNext() {
-    return cmdStatus()
+function migrateNext() {
+    return getStatus()
         .then(({ pending }) => {
             if (pending.length === 0) {
                 return Promise.reject(new Error('No pending migrations'));
@@ -104,12 +104,12 @@ function cmdMigrateNext() {
         });
 }
 
-function cmdReset() {
+function reset() {
     return umzug.down({ to: 0 });
 }
 
-function cmdResetPrev() {
-    return cmdStatus()
+function resetPrev() {
+    return getStatus()
         .then(({ executed }) => {
             if (executed.length === 0) {
                 return Promise.reject(new Error('Already at initial state'));
@@ -121,8 +121,8 @@ function cmdResetPrev() {
 
 
 module.exports = setup;
-module.exports.cmdStatus = cmdStatus;
-module.exports.cmdMigrate = cmdMigrate;
-module.exports.cmdMigrateNext = cmdMigrateNext;
-module.exports.cmdReset = cmdReset;
-module.exports.cmdResetPrev = cmdResetPrev;
+module.exports.getStatus = getStatus;
+module.exports.migrate = migrate;
+module.exports.migrateNext = migrateNext;
+module.exports.reset = reset;
+module.exports.resetPrev = resetPrev;

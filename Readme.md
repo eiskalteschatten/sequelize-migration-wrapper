@@ -41,7 +41,7 @@ const migrateDb = migration({
   filePattern: /\.js$/
 });
 
-await migrateDb.cmdMigrate();
+await migrateDb.migrate();
 ```
 
 #### Options
@@ -53,47 +53,47 @@ await migrateDb.cmdMigrate();
 
 ## API
 
-### cmdMigrate()
+### migrate()
 
 Runs through all migration scripts in the configured folder. Umzug automatically saves which migration scripts have already been run, so it will not re-run those.
 
 ```js
-await migrateDb.cmdMigrate();
+await migrateDb.migrate();
 ```
 
-### cmdStatus()
+### getStatus()
 
 Get the current status of the migration
 
 ```js
-const status = await migrateDb.cmdStatus();
+const status = await migrateDb.getStatus();
 ```
 
-### cmdMigrateNext()
+### migrateNext()
 
 Iteratively run through migration scripts.
 
 ```js
 for (const i in numberOfScriptsOrSomething) {
-  await migrateDb.cmdMigrateNext();
+  await migrateDb.migrateNext();
 }
 ```
 
-### cmdReset()
+### reset()
 
 Undo the last migration using Umzug's `down` function. This will only work if your migration scripts provide a `down` function. See [Umzug's documentation](https://github.com/sequelize/umzug#migrations) for more details.
 
 ```js
-await migrateDb.cmdReset();
+await migrateDb.reset();
 ```
 
-### cmdResetPrev()
+### resetPrev()
 
 Iteratively undo a migration. This will only work if your migration scripts provide a `down` function. See [Umzug's documentation](https://github.com/sequelize/umzug#migrations) for more details.
 
 ```js
 for (const i in numberOfScriptsOrSomething) {
-  await migrateDb.cmdResetPrev();
+  await migrateDb.resetPrev();
 }
 ```
 
