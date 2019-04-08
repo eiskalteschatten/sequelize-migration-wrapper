@@ -31,9 +31,9 @@ npm install --save sequelize-migration-wrapper
 ```js
 const sequelize = new Sequelize({...});
 
-const migration = require('sequelize-migration-wrapper');
+const migrateDb = require('sequelize-migration-wrapper');
 
-const migrateDb = migration({
+migrateDb({
   sequelize,
   path: 'path/to/migration/scripts',
   filePattern: /\.js$/
