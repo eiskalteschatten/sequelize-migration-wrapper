@@ -15,108 +15,30 @@
 
 ## Requirements
 
-This module is tested with Node.js 8 and 9. It might work with Node.js 6 or 7, but is not tested.
+This module is tested with Node.js 10 and 11. It might work with Node.js >= 9, but is not tested.
 
 
 ## Install
 
 ```
-npm install --save concatenate-js-middleware
+npm install --save sequelize-migration-wrapper
 ```
 
 ## Usage
 
-### For on-the-fly compiling
+Coming soon...
 
-```js
-const concatenateJs = require('concatenate-js-middleware');
-const jsConfig = require('./config/jsConfig.js');
-
-app.use('/js/:jsName', concatenateJs(jsConfig));
-```
-
-### For concatenating and saving as static JavaScript file
-
-```js
-const concatenateJs = require('concatenate-js-middleware');
-const jsConfig = require('./config/jsConfig.js');
-
-concatenateJs.concatenateJsAndSaveMultiple({
-  originPath: path.join(__dirname, 'public/js/'),
-  destinationPath: path.join(__dirname, 'public/js/'),
-  files: ['libs.js'],
-  minify: true,
-  config: jsConfig
-}).then(...).catch(...);
-```
 
 ## API
 
-### concatenateJs()
+Coming soon...
 
-Returns the concatenated JavaScript as a string.
 
-```js
-const concatenateJs = require('concatenate-js-middleware');
-const jsConfig = require('./config/jsConfig.js');
+## Release Notes
 
-const jsString = concatenateJs.concatenateJs(jsConfig['libs']).then(...).catch(...);
-```
+### 0.1.0
 
-### concatenateJsAndSave()
-
-Concatenates the given JavaScript file.
-
-```js
-const concatenateJs = require('concatenate-js-middleware');
-const jsConfig = require('./config/jsConfig.js');
-
-concatenateJs.concatenateJsAndSave({
-  originPath: path.join(__dirname, 'public/js/'),
-  destinationPath: path.join(__dirname, 'public/js/'),
-  file: 'libs.js',
-  minify: true,
-  config: jsConfig
-}).then(...).catch(...);
-```
-
-### concatenateJsAndSaveMultiple()
-
-Concatenates multiple JavaScript files defined in the "files" option.
-
-```js
-const concatenateJs = require('concatenate-js-middleware');
-const jsConfig = require('./config/jsConfig.js');
-
-concatenateJs.concatenateJsAndSaveMultiple({
-  originPath: path.join(__dirname, 'public/js/'),
-  destinationPath: path.join(__dirname, 'public/js/'),
-  files: ['libs.js'],
-  minify: true,
-  config: jsConfig
-}).then(...).catch(...);
-```
-
-### setupCleanupOnExit()
-
-Deletes the passed directory when the app is exited. The idea is to pass the directory where your compiled CSS files are, so that they can be deleted when the app is exited and recompiled when the app starts.
-
-```js
-const concatenateJs = require('concatenate-js-middleware');
-
-process.on('SIGINT', () => {
-  try {
-    concatenateJs.setupCleanupOnExit({
-      path: path.join(__dirname, 'public/js/'),
-      files: ['libs.js']
-    });
-    process.exit(0);
-  }
-  catch(error) {
-    process.exit(1);
-  }
-});
-```
+- Initial release
 
 
 ## Maintainer
