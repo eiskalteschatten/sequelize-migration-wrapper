@@ -14,7 +14,7 @@ function logUmzugEvent(eventName) {
 /*
   OPTIONS: {
     sequelize (no default, must be a Sequelize instance; required),
-    path (no default, required),
+    path (no default; required),
     filePattern (default: /\.js$/)
   }
 */
