@@ -14,13 +14,12 @@ function logUmzugEvent(eventName) {
 /*
   OPTIONS: {
     sequelize (no default, must be a Sequelize instance; required),
-    path (default: path.join(__dirname, 'migrations')),
+    path (no default, required),
     filePattern (default: /\.js$/)
   }
 */
 
 function setup(options) {
-    const pathToScripts = options.path || path.join(__dirname, 'migrations');
     const filePattern = options.filePattern || /\.js$/;
 
     if (!options.sequelize) {
@@ -28,20 +27,27 @@ function setup(options) {
         return;
     }
 
+    if (!options.path) {
+        console.error('No path to any migrations scripts was given.');
+        return;
+    }
+
+    const sequelize = options.sequelize;
+
     umzug = new Umzug({
         storage: 'sequelize',
         storageOptions: {
-            sequelize: options.sequelize,
+            sequelize,
         },
         migrations: {
             params: [
-                db.getQueryInterface(),
-                db.constructor,
+                sequelize.getQueryInterface(),
+                sequelize.constructor,
                 function() {
                     throw new Error('Migration tried to use old style "done" callback. Please upgrade to "umzug" and return a promise instead.');
                 }
             ],
-            path: pathToScripts,
+            path: options.path,
             pattern: filePattern
         },
         logging: () => {

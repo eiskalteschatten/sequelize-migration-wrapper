@@ -43,7 +43,7 @@ migrateDb({
 #### Options
 
 - sequelize (no default, must be a Sequelize instance; required),
-- path (default: `path.join(__dirname, 'migrations')`),
+- path (no default, required),
 - filePattern (default: `/\.js$/`)
 
 
