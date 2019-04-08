@@ -13,8 +13,8 @@ function logUmzugEvent(eventName) {
 
 /*
   OPTIONS: {
-    db (no default, must be a Sequelize instance),
-    path (default: 'path.join(__dirname, 'migrations')'),
+    sequelize (no default, must be a Sequelize instance),
+    path (default: path.join(__dirname, 'migrations')),
     filePattern (default: /\.js$/)
   }
 */
@@ -23,38 +23,36 @@ function setup(options) {
     const pathToScripts = options.path || path.join(__dirname, 'migrations');
     const filePattern = options.filePattern || /\.js$/;
 
-    return function() {
-        if (!options.db) {
-            console.error('');
-            return;
-        }
+    if (!options.sequelize) {
+        console.error('');
+        return;
+    }
 
-        umzug = new Umzug({
-            storage: 'sequelize',
-            storageOptions: {
-                sequelize: options.db,
-            },
-            migrations: {
-                params: [
-                    db.getQueryInterface(),
-                    db.constructor,
-                    function() {
-                        throw new Error('Migration tried to use old style "done" callback. Please upgrade to "umzug" and return a promise instead.');
-                    }
-                ],
-                path: pathToScripts,
-                pattern: filePattern
-            },
-            logging: () => {
-                console.log.apply(null, arguments);
-            },
-        });
+    umzug = new Umzug({
+        storage: 'sequelize',
+        storageOptions: {
+            sequelize: options.sequelize,
+        },
+        migrations: {
+            params: [
+                db.getQueryInterface(),
+                db.constructor,
+                function() {
+                    throw new Error('Migration tried to use old style "done" callback. Please upgrade to "umzug" and return a promise instead.');
+                }
+            ],
+            path: pathToScripts,
+            pattern: filePattern
+        },
+        logging: () => {
+            console.log.apply(null, arguments);
+        },
+    });
 
-        umzug.on('migrating', logUmzugEvent('migrating'));
-        umzug.on('migrated',  logUmzugEvent('migrated'));
-        umzug.on('reverting', logUmzugEvent('reverting'));
-        umzug.on('reverted',  logUmzugEvent('reverted'));
-    };
+    umzug.on('migrating', logUmzugEvent('migrating'));
+    umzug.on('migrated',  logUmzugEvent('migrated'));
+    umzug.on('reverting', logUmzugEvent('reverting'));
+    umzug.on('reverted',  logUmzugEvent('reverted'));
 }
 
 function cmdStatus() {
