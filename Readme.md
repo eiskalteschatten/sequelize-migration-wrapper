@@ -97,6 +97,10 @@ for (const i in numberOfScriptsOrSomething) {
 
 ## Release Notes
 
+### 0.1.1
+
+- Update dependencies to fix security vulnerabilities
+
 ### 0.1.0
 
 - Initial release
