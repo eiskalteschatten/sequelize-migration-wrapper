@@ -12,6 +12,9 @@
     "type": "git",
     "url": "git+https://github.com/eiskalteschatten/sequelize-migration-wrapper.git"
   },
+  "files": [
+    "dist"
+  ],
   "author": "Alex Seifert",
   "license": "MIT",
   "keywords": [
