@@ -10,18 +10,10 @@ function logUmzugEvent(eventName: string): any {
   };
 }
 
-/*
-  OPTIONS: {
-    sequelize (no default, must be a Sequelize instance; required),
-    path (no default; required),
-    filePattern (default: /\.js$/)
-  }
-*/
-
 export interface SetupOptions {
   sequelize: Sequelize;
   path: string;
-  filePattern: RegExp;
+  filePattern?: RegExp;
 }
 
 export default function setup(options: SetupOptions): void {
