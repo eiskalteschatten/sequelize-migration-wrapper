@@ -16,7 +16,7 @@ export interface SetupOptions {
   filePattern?: RegExp;
 }
 
-export default function setup(options: SetupOptions): void {
+export function setupUmzug(options: SetupOptions): void {
   const filePattern = options.filePattern || /\.js$/;
 
   if (!options.sequelize) {
@@ -57,6 +57,8 @@ export default function setup(options: SetupOptions): void {
   umzug.on('reverting', logUmzugEvent('reverting'));
   umzug.on('reverted', logUmzugEvent('reverted'));
 }
+
+export default setupUmzug;
 
 interface ExtendedMigration extends Migration {
   name?: string;
