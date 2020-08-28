@@ -34,7 +34,7 @@ export function setupUmzug(options: SetupOptions): void {
   umzug = new Umzug({
     storage: 'sequelize',
     storageOptions: {
-      sequelize,
+      sequelize
     },
     migrations: {
       params: [
@@ -73,14 +73,14 @@ export async function getStatus(): Promise<Status> {
   let executed: ExtendedMigration[] = await umzug.executed();
   let pending: ExtendedMigration[] = await umzug.pending();
 
-  executed = executed.map(m => {
-    m.name = path.basename(m.file, '.js');
-    return m;
+  executed = executed.map((migration: ExtendedMigration) => {
+    migration.name = path.basename(migration.file, '.js');
+    return migration;
   });
 
-  pending = pending.map(m => {
-    m.name = path.basename(m.file, '.js');
-    return m;
+  pending = pending.map((migration: ExtendedMigration) => {
+    migration.name = path.basename(migration.file, '.js');
+    return migration;
   });
 
   const current = executed.length > 0 ? executed[0].file : '<NO_MIGRATIONS>';
