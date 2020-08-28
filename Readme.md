@@ -15,7 +15,7 @@
 
 ## Requirements
 
-This module is tested with Node.js 10 and 11. It might work with Node.js >= 9, but is not tested.
+This module is tested with Node.js 14. It might work with Node.js >= 12, but is not tested.
 
 
 ## Install
@@ -29,11 +29,12 @@ npm install --save sequelize-migration-wrapper
 ### Initialization
 
 ```js
+import { setupMigration } from 'sequelize-migration-wrapper'; // TypeScript
+const { setupMigration } = require('sequelize-migration-wrapper'); // CommonJS
+
 const sequelize = new Sequelize({...});
 
-const migrateDb = require('sequelize-migration-wrapper');
-
-migrateDb({
+setupMigration({
   sequelize,
   path: 'path/to/migration/scripts',
   filePattern: /\.js$/
@@ -96,6 +97,11 @@ for (const i in numberOfScriptsOrSomething) {
 
 
 ## Release Notes
+
+### 1.0.0
+
+- Complete rewrite in TypeScript
+- Support for Sequelize 6
 
 ### 0.1.1
 
