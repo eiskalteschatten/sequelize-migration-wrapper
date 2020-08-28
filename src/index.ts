@@ -11,7 +11,7 @@ function logUmzugEvent(eventName: string): any {
 }
 
 export interface SetupOptions {
-  sequelize: Sequelize;
+  sequelize: InstanceType<typeof Sequelize>;
   path: string;
   filePattern?: RegExp;
 }
