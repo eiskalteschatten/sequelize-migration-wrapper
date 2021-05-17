@@ -98,6 +98,11 @@ for (const i in numberOfScriptsOrSomething) {
 
 ## Release Notes
 
+### 1.0.1
+
+- Security updates
+
+
 ### 1.0.0
 
 - Complete rewrite in TypeScript

@@ -1,6 +1,6 @@
 {
   "name": "sequelize-migration-wrapper",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A wrapper for migrating databases using Sequelize and Umzug.",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
