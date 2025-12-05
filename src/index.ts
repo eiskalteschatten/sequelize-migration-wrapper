@@ -1,6 +1,8 @@
 import path from 'path';
 import { Umzug, SequelizeStorage, MigrationMeta } from 'umzug';
-import { Sequelize } from 'sequelize';
+import { QueryInterface, Sequelize } from 'sequelize';
+
+export type MigrationFnOptions = { context: QueryInterface };
 
 let umzug: Umzug;
 

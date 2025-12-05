@@ -46,7 +46,6 @@ setupMigration({
 - glob (no default; required),
 
 
-
 ## API
 
 ### migrate()
