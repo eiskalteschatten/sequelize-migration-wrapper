@@ -1,8 +1,10 @@
 import path from 'path';
-import Umzug, { Migration } from 'umzug';
-import { Sequelize } from 'sequelize';
+import { Umzug, SequelizeStorage, MigrationMeta } from 'umzug';
+import { QueryInterface, Sequelize } from 'sequelize';
 
-let umzug: Umzug.Umzug;
+export type MigrationFnOptions = { context: QueryInterface };
+
+let umzug: Umzug;
 
 function logUmzugEvent(eventName: string): any {
   return (name: string): void => {
@@ -12,44 +14,25 @@ function logUmzugEvent(eventName: string): any {
 
 export interface SetupOptions {
   sequelize: InstanceType<typeof Sequelize>;
-  path: string;
-  filePattern?: RegExp;
+  glob: string;
 }
 
 export function setupMigration(options: SetupOptions): void {
-  const filePattern = options.filePattern || /\.js$/;
-
-  if (!options.sequelize) {
-    console.error('sequelize-migration-wrapper requires an instance of Sequelize.');
-    return;
+    if (!options.sequelize) {
+    throw new Error('sequelize-migration-wrapper requires an instance of Sequelize.');
   }
 
-  if (!options.path) {
-    console.error('No path to any migrations scripts was given.');
-    return;
+  if (!options.glob) {
+    throw new Error('No glob to any migrations scripts was given.');
   }
 
-  const sequelize = options.sequelize;
+  const { sequelize } = options;
 
   umzug = new Umzug({
-    storage: 'sequelize',
-    storageOptions: {
-      sequelize
-    },
-    migrations: {
-      params: [
-        sequelize.getQueryInterface(),
-        sequelize.constructor,
-        () => {
-          throw new Error('Migration tried to use old style "done" callback. Please upgrade to "umzug" and return a promise instead.');
-        }
-      ],
-      path: options.path,
-      pattern: filePattern
-    },
-    logging: () => {
-      console.log.apply(null, arguments);
-    },
+    storage: new SequelizeStorage({ sequelize }),
+    context: sequelize.getQueryInterface(),
+    migrations: { glob: options.glob },
+    logger: console,
   });
 
   umzug.on('migrating', logUmzugEvent('migrating'));
@@ -60,34 +43,19 @@ export function setupMigration(options: SetupOptions): void {
 
 export default setupMigration;
 
-interface ExtendedMigration extends Migration {
-  name?: string;
-}
-
 export interface Status {
-  executed: ExtendedMigration[];
-  pending: ExtendedMigration[];
+  executed: MigrationMeta[];
+  pending: MigrationMeta[];
 }
 
 export async function getStatus(): Promise<Status> {
-  let executed: ExtendedMigration[] = await umzug.executed();
-  let pending: ExtendedMigration[] = await umzug.pending();
-
-  executed = executed.map((migration: ExtendedMigration) => {
-    migration.name = path.basename(migration.file, '.js');
-    return migration;
-  });
-
-  pending = pending.map((migration: ExtendedMigration) => {
-    migration.name = path.basename(migration.file, '.js');
-    return migration;
-  });
-
-  const current = executed.length > 0 ? executed[0].file : '<NO_MIGRATIONS>';
+  const executed: MigrationMeta[] = await umzug.executed();
+  const pending: MigrationMeta[] = await umzug.pending();
+  const current = executed.length > 0 ? executed[0].name : '<NO_MIGRATIONS>';
   const status = {
     current: current,
-    executed: executed.map(m => m.file),
-    pending: pending.map(m => m.file),
+    executed: executed.map(m => m.name),
+    pending: pending.map(m => m.name),
   };
 
   console.log(JSON.stringify(status, null, 2));
@@ -95,11 +63,20 @@ export async function getStatus(): Promise<Status> {
   return { executed, pending };
 }
 
-export function migrate(): Promise<Migration[]> {
+function checkUmzugInitialized(): void {
+  if (!umzug) {
+    throw new Error('Umzug was not initialized. Did you forget to call setupMigration()?');
+  }
+}
+
+export function migrate(): Promise<MigrationMeta[]> {
+  checkUmzugInitialized();
   return umzug.up();
 }
 
-export async function migrateNext(): Promise<Migration[]> {
+export async function migrateNext(): Promise<MigrationMeta[]> {
+  checkUmzugInitialized();
+
   const { pending } = await getStatus();
 
   if (pending.length === 0) {
@@ -107,15 +84,17 @@ export async function migrateNext(): Promise<Migration[]> {
   }
 
   const next = pending[0].name;
-  
   return umzug.up({ to: next });
 }
 
-export function reset(): Promise<Migration[]> {
-  return umzug.down({ to: 0 });
+export function reset(): Promise<MigrationMeta[]> {
+  checkUmzugInitialized();
+  return umzug.down({ to: '0' });
 }
 
-export async function resetPrev(): Promise<Migration[]> {
+export async function resetPrev(): Promise<MigrationMeta[]> {
+  checkUmzugInitialized();
+
   const { executed } = await getStatus();
 
   if (executed.length === 0) {
@@ -123,6 +102,5 @@ export async function resetPrev(): Promise<Migration[]> {
   }
 
   const prev = executed[executed.length - 1].name;
-  
   return umzug.down({ to: prev });
 }

@@ -1,6 +1,6 @@
 {
   "name": "sequelize-migration-wrapper",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "description": "A wrapper for migrating databases using Sequelize and Umzug.",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -32,14 +32,13 @@
   },
   "homepage": "https://github.com/eiskalteschatten/sequelize-migration-wrapper#readme",
   "dependencies": {
-    "umzug": "^2.3.0"
+    "umzug": "^3.8.2"
   },
   "peerDependencies": {
     "sequelize": "^6.3.4"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
-    "@types/umzug": "^2.2.3",
     "sequelize": "^6.37.7",
     "typescript": "^5.9.3"
   }

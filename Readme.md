@@ -36,17 +36,14 @@ const sequelize = new Sequelize({...});
 
 setupMigration({
   sequelize,
-  path: 'path/to/migration/scripts',
-  filePattern: /\.js$/
+  glob: 'path/to/migration/scripts/*.{js,ts}',
 });
 ```
 
 #### Options
 
 - sequelize (no default, must be a Sequelize instance; required),
-- path (no default; required),
-- filePattern (default: `/\.js$/`)
-
+- glob (no default; required),
 
 
 ## API
@@ -97,6 +94,12 @@ for (const i in numberOfScriptsOrSomething) {
 
 
 ## Release Notes
+
+### 2.0.0
+
+- Major update for `umzug`
+- **Breaking Change:** a glob is now required instead of the `path`/`filePattern` combination
+- Security updates
 
 ### 1.0.1
 
