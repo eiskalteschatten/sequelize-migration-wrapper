@@ -49,19 +49,8 @@ export interface Status {
 }
 
 export async function getStatus(): Promise<Status> {
-  let executed: MigrationMeta[] = await umzug.executed();
-  let pending: MigrationMeta[] = await umzug.pending();
-
-  executed = executed.map((migration: MigrationMeta) => {
-    migration.name = path.basename(migration.name, '.js');
-    return migration;
-  });
-
-  pending = pending.map((migration: MigrationMeta) => {
-    migration.name = path.basename(migration.name, '.js');
-    return migration;
-  });
-
+  const executed: MigrationMeta[] = await umzug.executed();
+  const pending: MigrationMeta[] = await umzug.pending();
   const current = executed.length > 0 ? executed[0].name : '<NO_MIGRATIONS>';
   const status = {
     current: current,
