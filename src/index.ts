@@ -1,5 +1,5 @@
 import path from 'path';
-import { Umzug, SequelizeStorage, LogFn, MigrationMeta } from 'umzug';
+import { Umzug, SequelizeStorage, MigrationMeta } from 'umzug';
 import { Sequelize } from 'sequelize';
 
 let umzug: Umzug;
