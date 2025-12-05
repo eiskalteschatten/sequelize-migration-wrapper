@@ -12,34 +12,25 @@ function logUmzugEvent(eventName: string): any {
 
 export interface SetupOptions {
   sequelize: InstanceType<typeof Sequelize>;
-  path: string;
-  filePattern?: RegExp;
-  logger?: Record<'info' | 'warn' | 'error' | 'debug', LogFn>
+  glob: string;
 }
 
 export function setupMigration(options: SetupOptions): void {
-  const filePattern = options.filePattern || /\.js$/;
-
-  if (!options.sequelize) {
-    console.error('sequelize-migration-wrapper requires an instance of Sequelize.');
-    return;
+    if (!options.sequelize) {
+    throw new Error('sequelize-migration-wrapper requires an instance of Sequelize.');
   }
 
-  if (!options.path) {
-    console.error('No path to any migrations scripts was given.');
-    return;
+  if (!options.glob) {
+    throw new Error('No glob to any migrations scripts was given.');
   }
 
   const { sequelize } = options;
-  const path = options.path.endsWith('/') ? options.path.slice(0, -1) : options.path;
 
   umzug = new Umzug({
     storage: new SequelizeStorage({ sequelize }),
     context: sequelize.getQueryInterface(),
-    migrations: {
-      glob: `${path}/${filePattern}`,
-    },
-    logger: options.logger || console,
+    migrations: { glob: options.glob },
+    logger: console,
   });
 
   umzug.on('migrating', logUmzugEvent('migrating'));
@@ -50,7 +41,7 @@ export function setupMigration(options: SetupOptions): void {
 
 export default setupMigration;
 
-  export interface Status {
+export interface Status {
   executed: MigrationMeta[];
   pending: MigrationMeta[];
 }
@@ -81,11 +72,20 @@ export async function getStatus(): Promise<Status> {
   return { executed, pending };
 }
 
+function checkUmzugInitialized(): void {
+  if (!umzug) {
+    throw new Error('Umzug was not initialized. Did you forget to call setupMigration()?');
+  }
+}
+
 export function migrate(): Promise<MigrationMeta[]> {
+  checkUmzugInitialized();
   return umzug.up();
 }
 
 export async function migrateNext(): Promise<MigrationMeta[]> {
+  checkUmzugInitialized();
+
   const { pending } = await getStatus();
 
   if (pending.length === 0) {
@@ -97,10 +97,13 @@ export async function migrateNext(): Promise<MigrationMeta[]> {
 }
 
 export function reset(): Promise<MigrationMeta[]> {
+  checkUmzugInitialized();
   return umzug.down({ to: '0' });
 }
 
 export async function resetPrev(): Promise<MigrationMeta[]> {
+  checkUmzugInitialized();
+
   const { executed } = await getStatus();
 
   if (executed.length === 0) {
