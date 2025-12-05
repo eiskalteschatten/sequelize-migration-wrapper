@@ -37,7 +37,8 @@ const sequelize = new Sequelize({...});
 setupMigration({
   sequelize,
   path: 'path/to/migration/scripts',
-  filePattern: /\.js$/
+  filePattern: /\.js$/,
+  logger: console
 });
 ```
 
@@ -97,6 +98,11 @@ for (const i in numberOfScriptsOrSomething) {
 
 
 ## Release Notes
+
+### 2.0.0
+
+- Major update for `umzug`
+- Security updates
 
 ### 1.0.1
 

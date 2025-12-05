@@ -1,8 +1,8 @@
 import path from 'path';
-import Umzug, { Migration } from 'umzug';
+import { Umzug, SequelizeStorage, LogFn, MigrationMeta } from 'umzug';
 import { Sequelize } from 'sequelize';
 
-let umzug: Umzug.Umzug;
+let umzug: Umzug;
 
 function logUmzugEvent(eventName: string): any {
   return (name: string): void => {
@@ -14,6 +14,7 @@ export interface SetupOptions {
   sequelize: InstanceType<typeof Sequelize>;
   path: string;
   filePattern?: RegExp;
+  logger?: Record<'info' | 'warn' | 'error' | 'debug', LogFn>
 }
 
 export function setupMigration(options: SetupOptions): void {
@@ -29,27 +30,16 @@ export function setupMigration(options: SetupOptions): void {
     return;
   }
 
-  const sequelize = options.sequelize;
+  const { sequelize } = options;
+  const path = options.path.endsWith('/') ? options.path.slice(0, -1) : options.path;
 
   umzug = new Umzug({
-    storage: 'sequelize',
-    storageOptions: {
-      sequelize
-    },
+    storage: new SequelizeStorage({ sequelize }),
+    context: sequelize.getQueryInterface(),
     migrations: {
-      params: [
-        sequelize.getQueryInterface(),
-        sequelize.constructor,
-        () => {
-          throw new Error('Migration tried to use old style "done" callback. Please upgrade to "umzug" and return a promise instead.');
-        }
-      ],
-      path: options.path,
-      pattern: filePattern
+      glob: `${path}/${filePattern}`,
     },
-    logging: () => {
-      console.log.apply(null, arguments);
-    },
+    logger: options.logger || console,
   });
 
   umzug.on('migrating', logUmzugEvent('migrating'));
@@ -60,34 +50,30 @@ export function setupMigration(options: SetupOptions): void {
 
 export default setupMigration;
 
-interface ExtendedMigration extends Migration {
-  name?: string;
-}
-
-export interface Status {
-  executed: ExtendedMigration[];
-  pending: ExtendedMigration[];
+  export interface Status {
+  executed: MigrationMeta[];
+  pending: MigrationMeta[];
 }
 
 export async function getStatus(): Promise<Status> {
-  let executed: ExtendedMigration[] = await umzug.executed();
-  let pending: ExtendedMigration[] = await umzug.pending();
+  let executed: MigrationMeta[] = await umzug.executed();
+  let pending: MigrationMeta[] = await umzug.pending();
 
-  executed = executed.map((migration: ExtendedMigration) => {
-    migration.name = path.basename(migration.file, '.js');
+  executed = executed.map((migration: MigrationMeta) => {
+    migration.name = path.basename(migration.name, '.js');
     return migration;
   });
 
-  pending = pending.map((migration: ExtendedMigration) => {
-    migration.name = path.basename(migration.file, '.js');
+  pending = pending.map((migration: MigrationMeta) => {
+    migration.name = path.basename(migration.name, '.js');
     return migration;
   });
 
-  const current = executed.length > 0 ? executed[0].file : '<NO_MIGRATIONS>';
+  const current = executed.length > 0 ? executed[0].name : '<NO_MIGRATIONS>';
   const status = {
     current: current,
-    executed: executed.map(m => m.file),
-    pending: pending.map(m => m.file),
+    executed: executed.map(m => m.name),
+    pending: pending.map(m => m.name),
   };
 
   console.log(JSON.stringify(status, null, 2));
@@ -95,11 +81,11 @@ export async function getStatus(): Promise<Status> {
   return { executed, pending };
 }
 
-export function migrate(): Promise<Migration[]> {
+export function migrate(): Promise<MigrationMeta[]> {
   return umzug.up();
 }
 
-export async function migrateNext(): Promise<Migration[]> {
+export async function migrateNext(): Promise<MigrationMeta[]> {
   const { pending } = await getStatus();
 
   if (pending.length === 0) {
@@ -107,15 +93,14 @@ export async function migrateNext(): Promise<Migration[]> {
   }
 
   const next = pending[0].name;
-  
   return umzug.up({ to: next });
 }
 
-export function reset(): Promise<Migration[]> {
-  return umzug.down({ to: 0 });
+export function reset(): Promise<MigrationMeta[]> {
+  return umzug.down({ to: '0' });
 }
 
-export async function resetPrev(): Promise<Migration[]> {
+export async function resetPrev(): Promise<MigrationMeta[]> {
   const { executed } = await getStatus();
 
   if (executed.length === 0) {
@@ -123,6 +108,5 @@ export async function resetPrev(): Promise<Migration[]> {
   }
 
   const prev = executed[executed.length - 1].name;
-  
   return umzug.down({ to: prev });
 }

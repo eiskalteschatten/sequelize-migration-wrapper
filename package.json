@@ -32,14 +32,13 @@
   },
   "homepage": "https://github.com/eiskalteschatten/sequelize-migration-wrapper#readme",
   "dependencies": {
-    "umzug": "^2.3.0"
+    "umzug": "^3.8.2"
   },
   "peerDependencies": {
     "sequelize": "^6.3.4"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
-    "@types/umzug": "^2.2.3",
     "sequelize": "^6.37.7",
     "typescript": "^5.9.3"
   }
